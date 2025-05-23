@@ -20,6 +20,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("typed-input");
     const display = document.getElementById("text-display");
+    const form = document.getElementById("typing-form");
     const originalText = `<%= j @text %>`.replace(/\s+/g, ' ').trim();
     const timerDisplay = document.getElementById("timer");
     const wpmDisplay = document.getElementById("wpm");
@@ -28,6 +29,7 @@
 
     let startTime;
     let timerInterval;
+    let formSubmitted = false;
 
     function renderDisplay(typed = "") {
       let result = "";
@@ -36,8 +38,8 @@
       for (let i = 0; i < originalText.length; i++) {
         const originalChar = originalText[i];
         const typedChar = typed[i];
-
         let spanClass = "";
+
         if (typedChar == null) {
           spanClass = "";
         } else if (typedChar === originalChar) {
@@ -46,7 +48,7 @@
           spanClass = "incorrect";
         }
 
-        // Insert motorcycle icon right after the last correct char
+        // Motorcycle right after last correct character
         if (!motorcycleInserted && (typedChar == null || typedChar !== originalChar)) {
           result += `<i class="motorcycle icon moving-moto"></i>`;
           motorcycleInserted = true;
@@ -55,12 +57,22 @@
         result += `<span class="${spanClass}">${originalChar}</span>`;
       }
 
-      // If all correct, put motorcycle at the end
       if (!motorcycleInserted) {
         result += `<i class="motorcycle icon moving-moto"></i>`;
       }
 
       display.innerHTML = result;
+    }
+
+    function submitForm() {
+      if (!formSubmitted) {
+        const endTime = new Date().getTime();
+        const totalTime = (endTime - startTime) / 1000;
+        timeField.value = totalTime.toFixed(2);
+        clearInterval(timerInterval);
+        formSubmitted = true;
+        form.submit();
+      }
     }
 
     renderDisplay();
@@ -87,13 +99,27 @@
       accDisplay.textContent = isFinite(accuracy) ? `${accuracy}%` : "0%";
 
       renderDisplay(typed);
+
+      if (typed === originalText && accuracy === 100) {
+        submitForm();
+      }
     });
 
-    document.getElementById("typing-form").addEventListener("submit", () => {
-      const endTime = new Date().getTime();
-      const totalTime = (endTime - startTime) / 1000;
-      timeField.value = totalTime.toFixed(2);
-      clearInterval(timerInterval);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault(); // prevent newline in textarea
+        submitForm();
+      }
+    });
+
+    form.addEventListener("submit", () => {
+      if (!formSubmitted) {
+        const endTime = new Date().getTime();
+        const totalTime = (endTime - startTime) / 1000;
+        timeField.value = totalTime.toFixed(2);
+        clearInterval(timerInterval);
+        formSubmitted = true;
+      }
     });
   });
 </script>
