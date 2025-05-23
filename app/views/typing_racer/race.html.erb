@@ -1,6 +1,6 @@
 <div class="ui container" style="margin-top: 30px;">
   <h3 class="ui header">Type the following text:</h3>
-  <div class="ui segment" id="text-display"><%= @text %></div>
+  <div class="ui segment" id="text-display"></div>
   <form id="typing-form" action="/typing_racer/finish" method="post" data-turbo="false">
     <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
     <%= hidden_field_tag :original_text, @text %>
@@ -19,7 +19,8 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("typed-input");
-    const original = document.getElementById("text-display").innerText;
+    const display = document.getElementById("text-display");
+    const originalText = `<%= j @text %>`.replace(/\s+/g, ' ').trim();
     const timerDisplay = document.getElementById("timer");
     const wpmDisplay = document.getElementById("wpm");
     const accDisplay = document.getElementById("accuracy");
@@ -27,6 +28,26 @@
 
     let startTime;
     let timerInterval;
+
+    // Initial render
+    function renderDisplay(typed = "") {
+      let result = "";
+      for (let i = 0; i < originalText.length; i++) {
+        const originalChar = originalText[i];
+        const typedChar = typed[i];
+
+        if (typedChar == null) {
+          result += `<span>${originalChar}</span>`;
+        } else if (typedChar === originalChar) {
+          result += `<span class="correct">${originalChar}</span>`;
+        } else {
+          result += `<span class="incorrect">${originalChar}</span>`;
+        }
+      }
+      display.innerHTML = result;
+    }
+
+    renderDisplay();
 
     input.addEventListener("focus", () => {
       if (!startTime) {
@@ -39,15 +60,17 @@
     });
 
     input.addEventListener("input", () => {
-      const current = input.value;
+      const typed = input.value.replace(/\s+/g, ' ').trim();
       const elapsed = (new Date().getTime() - startTime) / 1000;
-      const words = current.trim().split(/\s+/).length;
+      const words = typed.length > 0 ? typed.split(" ").length : 0;
       const wpm = Math.round((words / elapsed) * 60);
-      const correct = current.split("").filter((c, i) => c === original[i]).length;
-      const accuracy = Math.round((correct / original.length) * 100);
+      const correct = typed.split("").filter((c, i) => c === originalText[i]).length;
+      const accuracy = Math.round((correct / originalText.length) * 100);
 
       wpmDisplay.textContent = isFinite(wpm) ? wpm : 0;
       accDisplay.textContent = isFinite(accuracy) ? `${accuracy}%` : "0%";
+
+      renderDisplay(typed);
     });
 
     document.getElementById("typing-form").addEventListener("submit", () => {
@@ -59,22 +82,19 @@
   });
 </script>
 <style>
-  /* Container tweaks */
+  /* Keep existing styles */
   .ui.container {
     max-width: 700px;
     margin: 30px auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 
-  /* Header styling */
   .ui.header {
     font-weight: 700;
-    color: #2185d0; /* Semantic UI primary blue */
-    margin-bottom: 1rem;
+    color: #2185d0;
     text-align: center;
   }
 
-  /* Text display box */
   #text-display {
     background-color: #f9f9f9;
     font-size: 1.25rem;
@@ -82,36 +102,34 @@
     padding: 20px;
     border-radius: 0.3rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    white-space: pre-wrap; /* Preserve line breaks */
-    user-select: none; /* Prevent text selection */
+    white-space: pre-wrap;
+    user-select: none;
     margin-bottom: 20px;
     min-height: 100px;
   }
 
   #typed-input {
-  width: 100%;               /* fill container like segment */
-  background-color: #f9f9f9; /* same as #text-display */
-  border: 1px solid #ddd;    /* subtle border */
-  border-radius: 0.3rem;     /* same border radius */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  padding: 20px;             /* same padding */
-  font-size: 1.25rem;
-  line-height: 1.6;
-  resize: both;              /* allow horizontal & vertical resizing */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  min-height: 100px;         /* match minimum height */
-  box-sizing: border-box;    /* include padding in width */
-  white-space: pre-wrap;     /* preserve spaces & line breaks */
+    width: 100%;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 0.3rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    resize: both;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100px;
+    box-sizing: border-box;
+    white-space: pre-wrap;
   }
 
-  /* Highlight border on focus */
   #typed-input:focus {
-    border-color: #21ba45 !important; /* Semantic UI green */
+    border-color: #21ba45 !important;
     box-shadow: 0 0 5px rgba(33, 186, 69, 0.5);
     outline: none;
   }
 
-  /* Finish button */
   .ui.teal.button {
     width: 100%;
     font-size: 1.1rem;
@@ -126,7 +144,6 @@
     box-shadow: 0 4px 10px rgba(22, 171, 156, 0.6);
   }
 
-  /* Stats segment */
   #stats {
     font-size: 1.1rem;
     color: #555;
@@ -141,7 +158,16 @@
   }
 
   #stats span {
-    color: #21ba45; /* Semantic UI green accent */
+    color: #21ba45;
     font-weight: 700;
+  }
+
+  /* New coloring */
+  .correct {
+    color: #21ba45;
+  }
+
+  .incorrect {
+    color: #db2828;
   }
 </style>
