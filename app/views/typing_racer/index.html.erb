@@ -1,0 +1,62 @@
+<!-- app/views/typing_racer/index.html.erb -->
+<div class="ui middle aligned center aligned grid" style="height: 100vh;">
+  <div class="column" style="max-width: 500px;">
+    <div class="ui segment clean-glow-card">
+      <h2 class="ui header center aligned">
+        <i class="keyboard outline icon"></i>
+        <div class="content">
+          Typing Racer
+        </div>
+      </h2>
+      <%= form_with url: typing_racer_race_path, method: :post, local: true, data: { turbo: false }, class: "ui form" do %>
+        <div class="field">
+          <label>Select Difficulty</label>
+          <select name="difficulty" class="ui dropdown">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <button type="submit" class="ui fluid primary button">🚀 Start Race</button>
+      <% end %>
+    </div>
+  </div>
+</div>
+<style>
+  body {
+    background-color: #f9f9f9;
+  }
+
+  .clean-glow-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.05),
+      0 8px 24px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .clean-glow-card:hover {
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.08),
+      0 12px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .ui.header .icon {
+    color: #2185d0;
+  }
+
+  .ui.dropdown {
+    background: white !important;
+    color: #333 !important;
+  }
+
+  .ui.dropdown > .menu {
+    background-color: white !important;
+  }
+
+  .ui.dropdown > .menu > .item {
+    color: #333 !important;
+  }
+</style>

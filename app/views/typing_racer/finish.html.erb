@@ -1,0 +1,62 @@
+<style>
+  .ui.container {
+    max-width: 700px;
+    margin: 30px auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .ui.header {
+    color: #2185d0; /* Semantic UI primary blue */
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  #results-segment {
+    background-color: #f9f9f9;
+    border-radius: 0.3rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 25px 30px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #444;
+  }
+
+  #results-segment p {
+    margin: 1rem 0;
+  }
+
+  #results-segment p strong {
+    color: #555;
+    font-weight: 700;
+  }
+
+  .ui.primary.button {
+    display: block;
+    width: 100%;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 25px;
+    padding: 14px 0;
+    box-shadow: 0 3px 7px rgba(33, 133, 208, 0.4);
+    transition: background-color 0.3s ease;
+  }
+
+  .ui.primary.button:hover {
+    background-color: #1678c2;
+    box-shadow: 0 4px 10px rgba(22, 120, 194, 0.7);
+  }
+</style>
+<div class="ui container" style="margin-top: 30px;">
+  <h2 class="ui header">Results</h2>
+  <div class="ui segment" id="results-segment">
+    <p><strong>Original Text:</strong></p>
+    <p><%= @original_text %></p>
+    <p><strong>Your Input:</strong></p>
+    <p><%= @typed_text %></p>
+    <p><strong>Time Taken:</strong> <%= @time_taken %> seconds</p>
+    <p><strong>Words Per Minute (WPM):</strong> <%= @wpm %></p>
+    <p><strong>Accuracy:</strong> <%= @accuracy %>%</p>
+  </div>
+  <a href="/typing_racer" class="ui primary button">Try Again</a>
+</div>
