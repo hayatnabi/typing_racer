@@ -6,7 +6,7 @@
     <%= hidden_field_tag :original_text, @text %>
     <%= hidden_field_tag :time, "", id: "time" %>
     <div class="field">
-      <textarea name="typed_text" id="typed-input" rows="10" cols="50" class="ui textarea"></textarea>
+      <textarea name="typed_text" id="typed-input" rows="10" cols="50" class="ui textarea" placeholder="Start typing here..."></textarea>
     </div>
     <button type="submit" class="ui teal button">Finish</button>
   </form>
@@ -29,21 +29,37 @@
     let startTime;
     let timerInterval;
 
-    // Initial render
     function renderDisplay(typed = "") {
       let result = "";
+      let motorcycleInserted = false;
+
       for (let i = 0; i < originalText.length; i++) {
         const originalChar = originalText[i];
         const typedChar = typed[i];
 
+        let spanClass = "";
         if (typedChar == null) {
-          result += `<span>${originalChar}</span>`;
+          spanClass = "";
         } else if (typedChar === originalChar) {
-          result += `<span class="correct">${originalChar}</span>`;
+          spanClass = "correct";
         } else {
-          result += `<span class="incorrect">${originalChar}</span>`;
+          spanClass = "incorrect";
         }
+
+        // Insert motorcycle icon right after the last correct char
+        if (!motorcycleInserted && (typedChar == null || typedChar !== originalChar)) {
+          result += `<i class="motorcycle icon moving-moto"></i>`;
+          motorcycleInserted = true;
+        }
+
+        result += `<span class="${spanClass}">${originalChar}</span>`;
       }
+
+      // If all correct, put motorcycle at the end
+      if (!motorcycleInserted) {
+        result += `<i class="motorcycle icon moving-moto"></i>`;
+      }
+
       display.innerHTML = result;
     }
 
@@ -169,5 +185,17 @@
 
   .incorrect {
     color: #db2828;
+  }
+
+  #text-display .motorcycle.icon.moving-moto {
+    color: #f2711c; /* Semantic UI orange */
+    margin-left: 2px;
+    margin-right: 2px;
+    animation: motoMove 0.2s ease-in-out;
+  }
+
+  @keyframes motoMove {
+    0% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
   }
 </style>
